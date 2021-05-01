@@ -1,0 +1,43 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+  <types:catalog>
+    <types:type name="inputType" format="json">
+      <types:shape format="weave" example="examples/input.json"><![CDATA[%dw 2.0
+
+type inputType = {|
+  operation: String, 
+  num1: Number {"typeId": "int"}, 
+  num2: Number {"typeId": "int"}
+|} {"example": "{\\\"operation\\\":\\\"Add\\\",\\\"num1\\\":10,\\\"num2\\\":20}"}
+
+]]></types:shape>
+    </types:type>
+  </types:catalog>
+  <types:enrichment select="#b55f436c-d18c-434c-a072-137dda84d885">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="inputType"/>
+        </types:message>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#08fd0ea5-fdd1-42c3-93ef-205716b61cac">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="inputType"/>
+        </types:message>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#5e941df3-718e-41e0-9d0b-e623c14b06ae">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="inputType"/>
+        </types:message>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+</types:mule>

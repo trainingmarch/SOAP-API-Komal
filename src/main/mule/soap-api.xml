@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:wsc="http://www.mulesoft.org/schema/mule/wsc" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd">
+	<wsc:config name="Web_Service_Consumer_Config" doc:name="Web Service Consumer Config" doc:id="55b8e0af-c6c8-49db-8b1f-3116af61b3c4" >
+		<wsc:connection wsdlLocation=" http://www.dneonline.com/calculator.asmx?wsdl" service="Calculator" port="CalculatorSoap" address="http://www.dneonline.com/calculator.asmx" />
+	</wsc:config>
+	<flow name="soap-apiFlow" doc:id="c71280f8-bd66-4035-9994-17b643c0c530" >
+		<http:listener doc:name="Listener" doc:id="eda129e7-e789-4aac-91a7-f6d2a7210988" config-ref="HTTP_Listener_config" path="/cal"/>
+		<logger level="INFO" doc:name="Logger" doc:id="28c38d30-1516-4d58-8bcf-6e00c55d8eff" message='"Inbound payload:" #[payload]'/>
+		<choice doc:name="Choice" doc:id="1137b513-8d2e-47f0-9ebf-b9d17c04d437" >
+			
+			<when expression='#[payload.operation == "Add"]'>
+				<ee:transform doc:name="Transform Message" doc:id="b55f436c-d18c-434c-a072-137dda84d885">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/xml
+ns ns0 http://tempuri.org/
+---
+{
+	ns0#Add: {
+		ns0#intA: payload.num1,
+		ns0#intB: payload.num2
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+				<wsc:consume doc:name="Consume-SOAP" doc:id="b2728802-23c2-4ca8-aca1-ad2e78ddd418" config-ref="Web_Service_Consumer_Config" operation="Add" />
+				<logger level="INFO" doc:name="Logger" doc:id="102d992f-6ae6-48ae-994a-7784538590c4" message='"Output of SOAP: " #[payload]' />
+				<ee:transform doc:name="Transform Message" doc:id="3421c167-ec68-4d34-8714-75a82dd3789b">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0ns ns0 http://tempuri.org/
+
+output application/json
+---
+{
+	"Output": payload.body.ns0#AddResponse.ns0#AddResult
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+			</when>
+			<when expression='#[payload.operation == "Sub"]'>
+				<ee:transform doc:name="Transform Message" doc:id="08fd0ea5-fdd1-42c3-93ef-205716b61cac">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/xml
+ns ns0 http://tempuri.org/
+---
+{
+	ns0#Subtract: {
+		ns0#intA: payload.num1,
+		ns0#intB: payload.num2
+	}
+	
+	}
+	
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+				<wsc:consume doc:name="Consume-SOAP" doc:id="6b24cacf-dce5-4563-980c-61c44645bcbf" config-ref="Web_Service_Consumer_Config" operation="Subtract" />
+				<logger level="INFO" doc:name="Logger" doc:id="11d713ec-4f57-4b99-83fd-dc5b66fa2185" message='"Output of Sub SOAP: " #[payload]' />
+				<ee:transform doc:name="Transform Message" doc:id="44e566ca-07c3-45dd-a03a-e2776ee4b667">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+ns ns0 http://tempuri.org/
+
+output application/json
+---
+{
+	"Output": payload.body.ns0#SubtractResponse.ns0#SubtractResult
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+			</when>
+
+						<when expression='#[payload.operation == "Mul"]'>
+				<ee:transform doc:name="Transform Message" doc:id="5e941df3-718e-41e0-9d0b-e623c14b06ae">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/xml
+ns ns0 http://tempuri.org/
+---
+{
+	ns0#Multiply: {
+		ns0#intA: payload.num1,
+		ns0#intB: payload.num2
+	}
+	
+	}
+	
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+				<wsc:consume doc:name="Consume-SOAP" doc:id="3df22e05-529a-42a0-bfe2-f11b6f588a61" config-ref="Web_Service_Consumer_Config" operation="Multiply" />
+				<logger level="INFO" doc:name="Logger" doc:id="5bb7cc4e-447e-4048-a85b-1faa101cb4e9" message='"Output of Multiply SOAP: " #[payload]' />
+				<ee:transform doc:name="Transform Message" doc:id="4907cf33-28d8-4895-95f0-a108989b5e9e">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+ns ns0 http://tempuri.org/
+
+output application/json
+---
+{
+	"Output": payload.body.ns0#MultiplyResponse.ns0#MultiplyResult
+	}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+			</when>
+			<otherwise >
+				<logger level="INFO" doc:name="Logger" doc:id="7bd36116-2bd1-43b6-bc73-de5ed1e0d65b" message='#[{&#10;	"Output": "Invalid Operation"&#10;}]'/>
+			</otherwise>
+		</choice>
+	</flow>
+</mule>
